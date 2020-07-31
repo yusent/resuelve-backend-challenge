@@ -1,6 +1,6 @@
 module Model.Player where
 
-import Test.QuickCheck (Arbitrary, NonNegative(..), arbitrary, elements)
+import Test.QuickCheck (Arbitrary, NonNegative(..), arbitrary, elements, listOf1)
 
 data Player = Player
     { playerName :: String
@@ -9,16 +9,16 @@ data Player = Player
     , playerSalary :: Rational
     , playerBonus :: Rational
     , playerTeamName :: String
-    } deriving Show
+    } deriving (Show, Eq)
 
-data PlayerLevel = A | B | C | Cuauh deriving Show
+data PlayerLevel = A | B | C | Cuauh deriving (Show, Eq)
 
 data Team = Team
     { teamName :: String
     , teamPlayers :: [Player]
     , teamGoalsCount :: Int
     , teamGoalsQuota :: Int
-    }
+    } deriving Show
 
 instance Arbitrary Player where
   arbitrary = do
@@ -36,6 +36,18 @@ instance Arbitrary Player where
       , playerSalary = salary
       , playerBonus = bonus
       , playerTeamName = teamName'
+      }
+
+instance Arbitrary Team where
+  arbitrary = do
+    name <- arbitrary
+    players <- listOf1 arbitrary
+
+    return Team
+      { teamName = name
+      , teamPlayers = players
+      , teamGoalsCount = sum $ map playerGoalsCount players
+      , teamGoalsQuota = sum $ map playerGoalsQuota players
       }
 
 playerGoalsQuota :: Player -> Int
