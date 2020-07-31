@@ -1,20 +1,19 @@
 module Model.Player where
 
-import Import (Text)
 
 data Player = Player
-    { playerName :: Text
+    { playerName :: String
     , playerLevel :: PlayerLevel
     , playerGoalsCount :: Int
     , playerSalary :: Rational
     , playerBonus :: Rational
-    , playerTeamName :: Text
+    , playerTeamName :: String
     }
 
 data PlayerLevel = A | B | C | Cuauh
 
 data Team = Team
-    { teamName :: Text
+    { teamName :: String
     , teamPlayers :: [Player]
     , teamGoalsCount :: Int
     , teamGoalsQuota :: Int
