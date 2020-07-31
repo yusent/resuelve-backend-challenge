@@ -27,7 +27,7 @@ instance Arbitrary Player where
     NonNegative goalsCount <- arbitrary
     NonNegative salary <- arbitrary
     NonNegative bonus <- arbitrary
-    teamName <- arbitrary
+    teamName' <- arbitrary
 
     return Player
       { playerName = name
@@ -35,7 +35,7 @@ instance Arbitrary Player where
       , playerGoalsCount = goalsCount
       , playerSalary = salary
       , playerBonus = bonus
-      , playerTeamName = teamName
+      , playerTeamName = teamName'
       }
 
 playerGoalsQuota :: Player -> Int
