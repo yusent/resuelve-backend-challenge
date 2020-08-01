@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Model.TeamSpec (spec) where
+module Model.TeamSpec (spec, testPlayers) where
 
 import qualified Data.Map.Strict as M (member, elems)
 import TestImport
