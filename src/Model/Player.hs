@@ -1,6 +1,5 @@
 module Model.Player where
 
-import Test.QuickCheck (Arbitrary, NonNegative(..), arbitrary, elements, listOf1)
 
 data Player = Player
     { playerName :: String
@@ -20,35 +19,6 @@ data Team = Team
     , teamGoalsQuota :: Int
     } deriving Show
 
-instance Arbitrary Player where
-  arbitrary = do
-    name <- arbitrary
-    level <- elements [A, B, C, Cuauh]
-    NonNegative goalsCount <- arbitrary
-    NonNegative salary <- arbitrary
-    NonNegative bonus <- arbitrary
-    teamName' <- arbitrary
-
-    return Player
-      { playerName = name
-      , playerLevel = level
-      , playerGoalsCount = goalsCount
-      , playerSalary = salary
-      , playerBonus = bonus
-      , playerTeamName = teamName'
-      }
-
-instance Arbitrary Team where
-  arbitrary = do
-    name <- arbitrary
-    players <- listOf1 arbitrary
-
-    return Team
-      { teamName = name
-      , teamPlayers = players
-      , teamGoalsCount = sum $ map playerGoalsCount players
-      , teamGoalsQuota = sum $ map playerGoalsQuota players
-      }
 
 playerGoalsQuota :: Player -> Int
 playerGoalsQuota = playerLevelGoalsQuota . playerLevel

@@ -38,7 +38,6 @@ dependencies:
 - case-insensitive
 - wai
 - foreign-store
-- QuickCheck
 
 # The library contains all of our application code. The executable
 # defined below is just a thin wrapper.
@@ -83,6 +82,7 @@ tests:
     - resuelve-backend-challenge
     - hspec >=2.0.0
     - yesod-test
+    - QuickCheck
 
 # Define flags used by "yesod devel" to make compilation faster
 flags:

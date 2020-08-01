@@ -1,11 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Model.PlayerSpec (spec) where
 
 import Prelude (head)
 import qualified Data.Set as S (fromList)
 import TestImport hiding (head)
-import Test.QuickCheck (conjoin, property)
+import Test.QuickCheck (Arbitrary, NonNegative(..), arbitrary, conjoin, elements, listOf1, property)
 import Model.Player
 
 spec :: Spec
@@ -55,6 +56,35 @@ spec = do
       \ps -> let teamCheck t = sum (playerGoalsQuota <$> filterPlayersByTeam ps t) == teamGoalsQuota t
              in all teamCheck $ groupPlayersIntoTeams ps
 
+instance Arbitrary Player where
+  arbitrary = do
+    name <- arbitrary
+    level <- elements [A, B, C, Cuauh]
+    NonNegative goalsCount <- arbitrary
+    NonNegative salary <- arbitrary
+    NonNegative bonus <- arbitrary
+    teamName' <- arbitrary
+
+    return Player
+      { playerName = name
+      , playerLevel = level
+      , playerGoalsCount = goalsCount
+      , playerSalary = salary
+      , playerBonus = bonus
+      , playerTeamName = teamName'
+      }
+
+instance Arbitrary Team where
+  arbitrary = do
+    name <- arbitrary
+    players <- listOf1 arbitrary
+
+    return Team
+      { teamName = name
+      , teamPlayers = players
+      , teamGoalsCount = sum $ map playerGoalsCount players
+      , teamGoalsQuota = sum $ map playerGoalsQuota players
+      }
 
 filterPlayersByTeam :: [Player] -> Team -> [Player]
 filterPlayersByTeam ps t = filter ((== teamName t) . playerTeamName) ps
