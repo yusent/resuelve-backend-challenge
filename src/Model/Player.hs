@@ -27,7 +27,7 @@ instance FromJSON Player where
       <*> v .: "equipo"
       <*> v .: "sueldo_completo"
 
-    parseJSON _ = fail "expected an object"
+    parseJSON invalid = prependFailure "Parsing Player failed, " (typeMismatch "Object" invalid)
 
 instance ToJSON Player where
     toJSON Player{..} = object
