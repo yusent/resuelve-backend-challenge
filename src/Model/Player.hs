@@ -1,5 +1,8 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model.Player where
 
+import qualified Data.Map as M (Map, empty, insert)
 
 data Player = Player
     { playerName :: String
@@ -19,6 +22,20 @@ data Team = Team
     , teamGoalsQuota :: Int
     } deriving Show
 
+calculateCompleteSalaries :: [Player] -> M.Map Player Rational
+calculateCompleteSalaries players = foldl teamsAccFunc M.empty teams
+  where
+    teamsAccFunc acc team = foldl (playersAccFunc team) acc $ teamPlayers team
+    playersAccFunc team acc player = M.insert player (playerCompleteSalary team player) acc
+    teams = groupPlayersIntoTeams players
+
+playerCompleteSalary :: Team -> Player -> Rational
+playerCompleteSalary Team{..} p@Player{..} = playerSalary + personalBonus + teamBonus
+  where
+    personalBonus = playerBonus * personalQuotaPercentage / 2
+    personalQuotaPercentage = min 1 (toRational playerGoalsCount / toRational (playerGoalsQuota p))
+    teamBonus = playerBonus * teamQuotaPercentage / 2
+    teamQuotaPercentage = min 1 (toRational teamGoalsCount / toRational teamGoalsQuota)
 
 playerGoalsQuota :: Player -> Int
 playerGoalsQuota = playerLevelGoalsQuota . playerLevel
