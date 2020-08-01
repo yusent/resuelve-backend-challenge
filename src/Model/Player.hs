@@ -9,9 +9,9 @@ data Player = Player
     , playerSalary :: Rational
     , playerBonus :: Rational
     , playerTeamName :: String
-    } deriving (Show, Eq)
+    } deriving (Show, Eq, Ord)
 
-data PlayerLevel = A | B | C | Cuauh deriving (Show, Eq)
+data PlayerLevel = A | B | C | Cuauh deriving (Show, Eq, Ord)
 
 data Team = Team
     { teamName :: String

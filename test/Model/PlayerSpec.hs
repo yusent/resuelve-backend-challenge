@@ -3,6 +3,7 @@
 module Model.PlayerSpec (spec) where
 
 import Prelude (head)
+import qualified Data.Set as S (fromList)
 import TestImport hiding (head)
 import Test.QuickCheck (conjoin, property)
 import Model.Player
@@ -32,3 +33,28 @@ spec = do
 
     it "should increment team's goals quota by the player's goals quota" $ property $
       \p t -> teamGoalsQuota (addPlayerToTeam p t) - playerGoalsQuota p == teamGoalsQuota t
+
+  describe "groupPlayersIntoTeams" $ do
+    it "should produce a list of teams where no two teams have the same name" $ property $
+      \ps -> let teamNames = map teamName $ groupPlayersIntoTeams ps
+             in length teamNames == length (S.fromList teamNames)
+
+    it "should produce a list of teams containing all the given players" $ property $
+      \ps -> let teams = groupPlayersIntoTeams ps
+             in S.fromList (concat $ teamPlayers <$> teams) == S.fromList ps
+
+    it "should produce a list of teams where each contains the right players" $ property $
+      \ps -> let teamCheck t = all ((== teamName t) . playerTeamName) $ teamPlayers t
+             in all teamCheck $ groupPlayersIntoTeams ps
+
+    it "should sum the correponding players' goals count" $ property $
+      \ps -> let teamCheck t = sum (playerGoalsCount <$> filterPlayersByTeam ps t) == teamGoalsCount t
+             in all teamCheck $ groupPlayersIntoTeams ps
+
+    it "should sum the correponding players' goals quota" $ property $
+      \ps -> let teamCheck t = sum (playerGoalsQuota <$> filterPlayersByTeam ps t) == teamGoalsQuota t
+             in all teamCheck $ groupPlayersIntoTeams ps
+
+
+filterPlayersByTeam :: [Player] -> Team -> [Player]
+filterPlayersByTeam ps t = filter ((== teamName t) . playerTeamName) ps
