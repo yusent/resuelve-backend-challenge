@@ -31,12 +31,6 @@ stanzas:
     # Can be added to any stanza
     requires-secure: false
 
-  # Static files.
-  - type: static-files
-    hosts:
-      - static.resuelve-backend-challenge.com
-    root: ../static
-
     # Uncomment to turn on directory listings.
     # directory-listing: true
 

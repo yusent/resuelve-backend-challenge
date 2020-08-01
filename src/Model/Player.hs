@@ -3,6 +3,7 @@
 
 module Model.Player where
 
+import Data.Aeson.Types (prependFailure, typeMismatch)
 import Data.Aeson (Value(Object), FromJSON, ToJSON, (.=), (.:), object, parseJSON, toJSON)
 import Numeric (fromRat, showFFloatAlt)
 import Model.PlayerLevel
