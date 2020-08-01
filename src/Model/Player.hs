@@ -1,8 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Model.Player where
 
 import qualified Data.Map as M (Map, empty, insert)
+import Data.Aeson (Value(Object), FromJSON, ToJSON, (.=), (.:), object, parseJSON, toJSON)
+import Numeric (fromRat, showFFloatAlt)
+import Model.PlayerLevel
 
 data Player = Player
     { playerName :: String
@@ -13,14 +17,33 @@ data Player = Player
     , playerTeamName :: String
     } deriving (Show, Eq, Ord)
 
-data PlayerLevel = A | B | C | Cuauh deriving (Show, Eq, Ord)
-
 data Team = Team
     { teamName :: String
     , teamPlayers :: [Player]
     , teamGoalsCount :: Int
     , teamGoalsQuota :: Int
     } deriving Show
+
+instance FromJSON Player where
+    parseJSON (Object v) = Player
+      <$> v .: "nombre"
+      <*> v .: "nivel"
+      <*> v .: "goles"
+      <*> v .: "sueldo"
+      <*> v .: "bono"
+      <*> v .: "equipo"
+
+    parseJSON _ = fail "expected an object"
+
+instance ToJSON Player where
+    toJSON Player{..} = object
+      [ "nombre" .= playerName
+      , "nivel" .= playerLevel
+      , "goles" .= playerGoalsCount
+      , "sueldo" .= rationalToFloat playerSalary
+      , "bono" .= rationalToFloat playerBonus
+      , "equipo" .= playerTeamName
+      ]
 
 calculateCompleteSalaries :: [Player] -> M.Map Player Rational
 calculateCompleteSalaries players = foldl teamsAccFunc M.empty teams
@@ -39,12 +62,6 @@ playerCompleteSalary Team{..} p@Player{..} = playerSalary + personalBonus + team
 
 playerGoalsQuota :: Player -> Int
 playerGoalsQuota = playerLevelGoalsQuota . playerLevel
-
-playerLevelGoalsQuota :: PlayerLevel -> Int
-playerLevelGoalsQuota A = 5
-playerLevelGoalsQuota B = 10
-playerLevelGoalsQuota C = 15
-playerLevelGoalsQuota Cuauh = 20
 
 groupPlayersIntoTeams :: [Player] -> [Team]
 groupPlayersIntoTeams = groupPlayersIntoTeamsRec []
@@ -73,3 +90,6 @@ addPlayerToTeam player team = team
   , teamGoalsCount = playerGoalsCount player + teamGoalsCount team
   , teamGoalsQuota = playerGoalsQuota player + teamGoalsQuota team
   }
+
+rationalToFloat :: Rational -> Float
+rationalToFloat r = read $ showFFloatAlt (Just 2) (fromRat r :: Double) ""

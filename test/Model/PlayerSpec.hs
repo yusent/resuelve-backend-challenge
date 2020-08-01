@@ -6,12 +6,32 @@ module Model.PlayerSpec (spec) where
 import Prelude (head)
 import qualified Data.Map as M ((!))
 import qualified Data.Set as S (fromList)
+import Data.Aeson (decode, encode)
 import TestImport hiding (head)
 import Test.QuickCheck (Arbitrary, NonNegative(..), arbitrary, conjoin, elements, listOf1, property)
 import Model.Player
+import Model.PlayerLevel
 
 spec :: Spec
 spec = do
+  describe "Player" $ do
+    let json = "{\
+          \ \"nombre\": \"Juan\",\
+          \ \"nivel\": \"C\",\
+          \ \"goles\": 10,\
+          \ \"sueldo\": 50000,\
+          \ \"bono\": 25000,\
+          \ \"sueldo_completo\":null,\
+          \ \"equipo\":\"rojo\"\
+        \}"
+        player = Player "Juan" C 10 50000 25000 "rojo"
+
+    it "should be decodable from JSON" $ do
+      decode json `shouldBe` Just player
+
+    it "should be isomorphic" $ do
+      decode (encode player) `shouldBe` Just player
+
   describe "playerGoalsQuota" $ do
     it "should return the player's level quota" $ property $
       \p -> playerGoalsQuota p == playerLevelGoalsQuota (playerLevel p)
