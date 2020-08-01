@@ -3,7 +3,7 @@
 
 module Model.Player where
 
-import qualified Data.Map as M (Map, empty, insert)
+import qualified Data.Map as M (Map, (!), empty, insert)
 import Data.Aeson (Value(Object), FromJSON, ToJSON, (.=), (.:), object, parseJSON, toJSON)
 import Numeric (fromRat, showFFloatAlt)
 import Model.PlayerLevel
@@ -15,6 +15,7 @@ data Player = Player
     , playerSalary :: Rational
     , playerBonus :: Rational
     , playerTeamName :: String
+    , playerCompleteSalary :: Maybe Rational
     } deriving (Show, Eq, Ord)
 
 data Team = Team
@@ -32,6 +33,7 @@ instance FromJSON Player where
       <*> v .: "sueldo"
       <*> v .: "bono"
       <*> v .: "equipo"
+      <*> v .: "sueldo_completo"
 
     parseJSON _ = fail "expected an object"
 
@@ -43,17 +45,24 @@ instance ToJSON Player where
       , "sueldo" .= rationalToFloat playerSalary
       , "bono" .= rationalToFloat playerBonus
       , "equipo" .= playerTeamName
+      , "sueldo_completo" .= fmap rationalToFloat playerCompleteSalary
       ]
+
+fillCompleteSalaries :: [Player] -> [Player]
+fillCompleteSalaries players = fillCompleteSalary <$> players
+  where
+    fillCompleteSalary player = player { playerCompleteSalary = Just (salariesMap M.! player) }
+    salariesMap = calculateCompleteSalaries players
 
 calculateCompleteSalaries :: [Player] -> M.Map Player Rational
 calculateCompleteSalaries players = foldl teamsAccFunc M.empty teams
   where
     teamsAccFunc acc team = foldl (playersAccFunc team) acc $ teamPlayers team
-    playersAccFunc team acc player = M.insert player (playerCompleteSalary team player) acc
+    playersAccFunc team acc player = M.insert player (calculatePlayerCompleteSalary team player) acc
     teams = groupPlayersIntoTeams players
 
-playerCompleteSalary :: Team -> Player -> Rational
-playerCompleteSalary Team{..} p@Player{..} = playerSalary + personalBonus + teamBonus
+calculatePlayerCompleteSalary :: Team -> Player -> Rational
+calculatePlayerCompleteSalary Team{..} p@Player{..} = playerSalary + personalBonus + teamBonus
   where
     personalBonus = playerBonus * personalQuotaPercentage / 2
     personalQuotaPercentage = min 1 (toRational playerGoalsCount / toRational (playerGoalsQuota p))

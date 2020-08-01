@@ -4,7 +4,6 @@
 module Model.PlayerSpec (spec) where
 
 import Prelude (head)
-import qualified Data.Map as M ((!))
 import qualified Data.Set as S (fromList)
 import Data.Aeson (decode, encode)
 import TestImport hiding (head)
@@ -24,7 +23,7 @@ spec = do
           \ \"sueldo_completo\":null,\
           \ \"equipo\":\"rojo\"\
         \}"
-        player = Player "Juan" C 10 50000 25000 "rojo"
+        player = Player "Juan" C 10 50000 25000 "rojo" Nothing
 
     it "should be decodable from JSON" $ do
       decode json `shouldBe` Just player
@@ -77,18 +76,17 @@ spec = do
       \ps -> let teamCheck t = sum (playerGoalsQuota <$> filterPlayersByTeam ps t) == teamGoalsQuota t
              in all teamCheck $ groupPlayersIntoTeams ps
 
-  describe "calculateCompleteSalaries" $ do
-    it "should calculate the right salaries for all players" $ do
-      let completeSalaries = calculateCompleteSalaries testPlayers
-          juan : pedro : martin : luis : perez : cuauh : cosme : rulo : _ = testPlayers
-      (completeSalaries M.! juan) `shouldBe` 14950
-      (completeSalaries M.! pedro) `shouldBe` 29150
-      (completeSalaries M.! martin) `shouldBe` 44850
-      (completeSalaries M.! luis) `shouldBe` 59550
-      (completeSalaries M.! perez) `shouldBe` (203500 / 3)
-      (completeSalaries M.! cuauh) `shouldBe` 130000
-      (completeSalaries M.! cosme) `shouldBe` 30000
-      (completeSalaries M.! rulo) `shouldBe` 42450
+  describe "fillCompleteSalaries" $ do
+    it "should assign the right complete salary to all players" $ do
+      let juan : pedro : martin : luis : perez : cuauh : cosme : rulo : _ = fillCompleteSalaries testPlayers
+      playerCompleteSalary juan `shouldBe` Just 14950
+      playerCompleteSalary pedro `shouldBe` Just 29150
+      playerCompleteSalary martin `shouldBe` Just 44850
+      playerCompleteSalary luis `shouldBe` Just 59550
+      playerCompleteSalary perez `shouldBe` Just (203500 / 3)
+      playerCompleteSalary cuauh `shouldBe` Just 130000
+      playerCompleteSalary cosme `shouldBe` Just 30000
+      playerCompleteSalary rulo `shouldBe` Just 42450
 
 instance Arbitrary Player where
   arbitrary = do
@@ -106,6 +104,7 @@ instance Arbitrary Player where
       , playerSalary = salary
       , playerBonus = bonus
       , playerTeamName = teamName'
+      , playerCompleteSalary = Nothing
       }
 
 instance Arbitrary Team where
@@ -132,6 +131,7 @@ testPlayers =
     , playerSalary = 12500
     , playerBonus = 2500
     , playerTeamName = "Resuelve FC"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "Pedro"
@@ -140,6 +140,7 @@ testPlayers =
     , playerSalary = 25000
     , playerBonus = 5000
     , playerTeamName = "Resuelve FC"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "Martín"
@@ -148,6 +149,7 @@ testPlayers =
     , playerSalary = 37500
     , playerBonus = 7500
     , playerTeamName = "Resuelve FC"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "Luis"
@@ -156,6 +158,7 @@ testPlayers =
     , playerSalary = 50000
     , playerBonus = 10000
     , playerTeamName = "Resuelve FC"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "Juan Perez"
@@ -164,6 +167,7 @@ testPlayers =
     , playerSalary = 50000
     , playerBonus = 25000
     , playerTeamName = "rojo"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "EL Cuauh"
@@ -172,6 +176,7 @@ testPlayers =
     , playerSalary = 100000
     , playerBonus = 30000
     , playerTeamName = "azul"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "Cosme Fulanito"
@@ -180,6 +185,7 @@ testPlayers =
     , playerSalary = 20000
     , playerBonus = 10000
     , playerTeamName = "azul"
+    , playerCompleteSalary = Nothing
     }
   , Player
     { playerName = "El Rulo"
@@ -188,5 +194,6 @@ testPlayers =
     , playerSalary = 30000
     , playerBonus = 15000
     , playerTeamName = "rojo"
+    , playerCompleteSalary = Nothing
     }
   ]
