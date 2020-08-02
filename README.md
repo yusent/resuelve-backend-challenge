@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yusent/resuelve-backend-challenge.svg?branch=master)](https://travis-ci.org/yusent/resuelve-backend-challenge)
+
 # Resuelve's Backend Challenge
 
 For more information see [challenge description](https://github.com/resuelve/prueba-ing-backend).
@@ -19,7 +21,7 @@ stack exec -- yesod devel
 
 ## Tests
 
-Run the test suit with:
+Run the test suite with:
 
 ```
 stack test
