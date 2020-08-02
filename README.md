@@ -37,3 +37,15 @@ First install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 heroku create -b https://github.com/mfine/heroku-buildpack-stack
 git push heroku master
 ```
+
+## Usage
+
+An instance of the API is already available at [https://resuelve-backend-challenge.herokuapp.com](https://resuelve-backend-challenge.herokuapp.com)
+
+Using curl:
+```
+  curl -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '[{ "nombre": "Juan Perez", "nivel": "C", "goles": 10, "sueldo": 50000, "bono": 25000, "sueldo_completo": null, "equipo": "rojo" }]' \
+    https://resuelve-backend-challenge.herokuapp.com/calculate_salaries
+```
