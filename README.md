@@ -26,3 +26,14 @@ Run the test suite with:
 ```
 stack test
 ```
+
+## Deployment
+
+### Heroku
+
+First install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) if you haven't already. Then run the following:
+
+```
+heroku create -b https://github.com/mfine/heroku-buildpack-stack
+git push heroku master
+```
