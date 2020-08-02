@@ -29,6 +29,15 @@ spec = do
     it "should be isomorphic" $ do
       decode (encode player) `shouldBe` Just player
 
+    it "should not accept a negative goals count" $ do
+      decode (encode player{ playerGoalsCount = -1 }) `shouldBe` (Nothing :: Maybe Player)
+
+    it "should not accept a negative salary" $ do
+      decode (encode player{ playerSalary = -1 }) `shouldBe` (Nothing :: Maybe Player)
+
+    it "should not accept a negative bonus" $ do
+      decode (encode player{ playerBonus = -1 }) `shouldBe` (Nothing :: Maybe Player)
+
   describe "playerGoalsQuota" $ do
     it "should return the player's level quota" $ property $
       \p -> playerGoalsQuota p == playerLevelGoalsQuota (playerLevel p)
