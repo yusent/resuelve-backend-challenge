@@ -3,6 +3,7 @@
 
 module Model.Player where
 
+import Control.Monad (when)
 import Data.Aeson.Types (prependFailure, typeMismatch)
 import Data.Aeson (Value(Object), FromJSON, ToJSON, (.=), (.:), object, parseJSON, toJSON)
 import Numeric (fromRat, showFFloatAlt)
@@ -19,14 +20,20 @@ data Player = Player
     } deriving (Show, Eq, Ord)
 
 instance FromJSON Player where
-    parseJSON (Object v) = Player
-      <$> v .: "nombre"
-      <*> v .: "nivel"
-      <*> v .: "goles"
-      <*> v .: "sueldo"
-      <*> v .: "bono"
-      <*> v .: "equipo"
-      <*> v .: "sueldo_completo"
+    parseJSON (Object v) = do
+      playerName <- v .: "nombre"
+      playerLevel <- v .: "nivel"
+      playerGoalsCount <- v .: "goles"
+      playerSalary <- v .: "sueldo"
+      playerBonus <- v .: "bono"
+      playerTeamName <- v .: "equipo"
+      playerCompleteSalary <- v .: "sueldo_completo"
+
+      when (playerGoalsCount < 0) $ fail "Expected a non-negative value for 'goles'"
+      when (playerSalary < 0) $ fail "Expected a non-negative value for 'sueldo'"
+      when (playerBonus < 0) $ fail "Expected a non-negative value for 'bono'"
+
+      return Player{..}
 
     parseJSON invalid = prependFailure "Parsing Player failed, " (typeMismatch "Object" invalid)
 
