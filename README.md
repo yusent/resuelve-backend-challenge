@@ -47,5 +47,5 @@ Using curl:
   curl -H "Content-Type: application/json" \
     -H "Accept: application/json" \
     -d '[{ "nombre": "Juan Perez", "nivel": "C", "goles": 10, "sueldo": 50000, "bono": 25000, "sueldo_completo": null, "equipo": "rojo" }]' \
-    https://resuelve-backend-challenge.herokuapp.com/calculate_salaries
+    https://resuelve-backend-challenge.herokuapp.com/api/v1/calculate_salaries
 ```

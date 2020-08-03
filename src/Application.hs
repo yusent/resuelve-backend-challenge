@@ -34,7 +34,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              mkRequestLogger, outputFormat)
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
-import Handler.Salary
+import Handler.V1.Salary
 
 mkYesodDispatch "App" resourcesApp
 

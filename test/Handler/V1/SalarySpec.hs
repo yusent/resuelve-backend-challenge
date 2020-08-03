@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Handler.SalarySpec (spec) where
+module Handler.V1.SalarySpec (spec) where
 
 import TestImport hiding (length)
 import Data.Aeson (encode)
@@ -10,7 +10,7 @@ import Model.Player (Player, playerCompleteSalary)
 
 spec :: Spec
 spec = withApp $ do
-  describe "postPlayersCompleteSalaryR" $ do
+  describe "postV1PlayersCompleteSalaryR" $ do
     it "Can make requests using JSON, and parse JSON responses" $ do
       submitTestRequest
       statusIs 200
@@ -35,4 +35,4 @@ submitTestRequest = request $ do
   addRequestHeader ("Accept", "application/json")
   addRequestHeader ("Content-Type", "application/json")
   setMethod "POST"
-  setUrl PlayersCompleteSalaryR
+  setUrl V1PlayersCompleteSalaryR
